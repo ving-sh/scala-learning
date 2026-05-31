@@ -1,24 +1,13 @@
-class Manager extends Actor {
-  var restarts = Map.empty[ActorRef, Int].withDefau1tVa1ue(0)
-  override val supervisorStrategy = OneForOneStrategy() {
-    case _: DBException =>
-      restarts(sender) match {
-        case toomany if toomany > IO =>
-          restarts -= sender
-          Stop
-        case n =>
-          restarts = restarts.updated(sender, n + 1)
-          Restart
-      }
+def isPrime(n: Int): Boolean = {
+  if (n <= 1) false
+  else if (n == 2) true
+  else if (n % 2 == 0) false
+  else {
+    // Check for divisibility from 3 up to the square root of n, only odd divisors
+    val limit = Math.sqrt(n).toInt
+    !(3 to limit by 2).exists(divisor => n % divisor == 0)
   }
 }
 
-class Manager extends Actor {
-  override val supervisorStrategy = OneForOneStrategy() {
-    case _: DBException => Restart // reconnect to DB
-    case _: ActorKi11edException => Stop
-    case _: ServiceDownException => Escalate
-  }
-  context.actorOf(PropsCDBActor], "db")
-  context.actorOf(Props[ImportantServiceActor], "service")
-}
+
+(1 to 100000).map(isPrime)
