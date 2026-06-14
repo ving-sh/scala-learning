@@ -75,5 +75,64 @@ object List {
   def productL(as: List[Int]): Int = foldLeft(as, 1, (acc, i)=> acc*i)
 
   //Ex: 3.12
-  def reverse[A](as: List[A]):List[A] = ???
+  def reverse[A](as: List[A]):List[A] = foldLeft(as, Nil, (acc, i) => Cons(i, acc))
+
+  //Ex: 3.13
+  def foldRightViaFoldLeft[A, B](as: List[A], acc: B, f: (A, B) => B): B =
+    foldLeft(as, (b:B) => b, (g:B => B, a:A)=> (b:B) => g(f(a,b)))(acc)
+//    foldLeft(reverse(as), acc, (acc, i) => f(i,acc))
+
+  //Ex: 3.14
+  def append[A](a1: List[A], a2: List[A]): List[A] = foldRight(a1, a2, Cons(_,_))
+
+  //Ex:3.15
+  def concat[A](as: List[List[A]]): List[A] = foldRight(as, Nil, append)
+
+  //Ex:3.16
+  def addOne(as: List[Int]): List[Int] = foldRight(as, Nil, (i, acc) => Cons(i+1, acc))
+
+  //Ex:3.17
+  def doubleToString(as: List[Double]): List[String] = foldRight(as, Nil, (i, acc) => Cons(i.toString, acc))
+
+  //Ex:3.18
+  def map[A, B](as: List[A], f: A => B): List[B] = foldRight(as, Nil, (i,acc) => Cons(f(i),acc))
+
+  //Ex:3.19
+  def filter[A](as: List[A], f: A => Boolean): List[A] = foldRight(as, Nil, (i, acc) => if f(i) then Cons(i,acc) else acc)
+
+  //Ex:3.20
+  def flatMap[A, B](as: List[A], f: A => List[B]): List[B] = concat(map(as,f))
+
+  //Ex: 3.21
+  def filterUsingFlatMap[A](as: List[A], f:A => Boolean): List[A] = flatMap(as, i=> if f(i) then List(i) else Nil)
+
+  //Ex:3.22
+  def addPairwise(a: List[Int], b: List[Int]): List[Int] = (a,b) match {
+    case (Cons(x1, t1), Cons(x2, t2)) => Cons(x1+x2, addPairwise(t1,t2))
+    case (Nil, Nil) => Nil
+    case _ => sys.error("Lists are not pairs")
+  }
+
+  //Ex:3.23
+  def zipWith[A,B,C](a: List[A], b: List[B], f:(A,B)=> C): List[C] = (a,b) match {
+    case (Cons(x1, t1), Cons(x2, t2)) => Cons(f(x1,x2), zipWith(t1,t2,f))
+    case (Nil, Nil) => Nil
+    case _ => sys.error("Lists are not pairs")
+  }
+
+  //Ex:3.24
+  def take[A](as: List[A], n: Int): List[A] = as match
+    case Cons(h, t) if n > 0 => Cons(h, take(t, n-1))
+    case _ if n == 0 => Nil
+    case _ => sys.error("negative number not required")
+  
+  def subFromStart[A](a: List[A], b: List[A]): Boolean = take(a, length(b)) == b
+
+  @tailrec
+  def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = (sup, sub) match
+    case (_, Nil) => true
+    case (Cons(h1, t1), Cons(h2, t2)) if h1 == h2 && subFromStart(sup, sub) => true
+    case (Cons(h1, t1), Cons(h2, t2)) => hasSubsequence(t1, sub)
+    case _ => false
+
 }
