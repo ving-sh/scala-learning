@@ -47,3 +47,14 @@ List.hasSubsequence(ls, List(1,2,3))
 List.hasSubsequence(ls, List(3))
 List.hasSubsequence(ls, List(3,4))
 List.hasSubsequence(ls, List(2,3,7))
+
+
+import redbook.Tree
+import redbook.Tree._
+
+val tree = Branch(Leaf(1), Branch(Branch(Leaf(2),Leaf(3)), Leaf(1)))
+
+tree.max
+tree.depth
+
+tree.map(_*3)
