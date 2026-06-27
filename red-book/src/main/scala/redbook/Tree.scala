@@ -20,8 +20,12 @@ enum Tree[+A] {
     case Leaf(i) => Leaf(f(i))
     case Branch(l, r) => Branch(l.map(f), r.map(f))
   }
-
-
+  
+  //Ex:3.28
+  def fold[B](f:(A,B)=> B, g: (B,B) => B): B = this match {
+    case Leaf(v) => f(v, acc)
+    case Branch(l, r) => g(l.fold(f,g), r.fold(f,g))
+  }
 }
 
 object Tree {
