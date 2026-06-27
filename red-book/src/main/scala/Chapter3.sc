@@ -56,5 +56,11 @@ val tree = Branch(Leaf(1), Branch(Branch(Leaf(2),Leaf(3)), Leaf(1)))
 
 tree.max
 tree.depth
+tree.size
 
-tree.map(_*3)
+val tree2 = tree.map(_*3)
+
+val sumOfTree = tree2.fold(i => i, (l,r)=>l+r)
+val depthOfTree = tree2.fold(i=>1, (l,r)=> l+r)
+val sizeOfTree = tree2.fold(i=>1, 1+_+_)
+val maxOfTree = tree2.fold(i=>i, (l,r)=> if l>r then l else r)
