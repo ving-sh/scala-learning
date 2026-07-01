@@ -12,5 +12,21 @@ def failingFn2(i: Int): Int =
     x + ((throw Exception("fail!")): Int)
   catch
     case e: Exception => 43
+
+import redbook.Option
+import redbook.Option._
+
+def mean(xs: Seq[Double]): Option[Double] =
+  if xs.isEmpty then None
+  else Some(xs.sum / xs.length)
+
+def variance(xs: Seq[Double]): Option[Double] = mean(xs).flatMap(m => mean(xs.map(x => math.pow(x-m,2))))
     
-    
+variance(Seq(1,2,3,4,5))
+
+map2(Some(2), Some(3))(_+_)
+map2(Some(2), None:Option[Int])(_+_)
+map2(None:Option[Int], Some(3))(_+_)
+
+sequence(redbook.List(Some(1), Some(2), Some(3)))
+sequence(redbook.List(Some(1), Some(2), None))
