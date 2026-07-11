@@ -1,5 +1,7 @@
 package redbook
 
+import redbook.List.Cons
+
 enum Option[+A] {
   case Some(value: A)
   case None
@@ -27,8 +29,17 @@ enum Option[+A] {
 object Option {
 
   //Ex:4.3
-  def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = a.flatMap(i => b.map(j => f(i, j)))
+//  def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = a.flatMap(i => b.map(j => f(i, j)))
 
+  def map2[A,B,C](a: Option[A], b: Option[B])(f:(A,B)=> C): Option[C] =
+    for{
+      i <- a
+      j <- b
+    } yield f(i,j)
+    
   //Ex:4.4
-  def sequence[A](as: List[Option[A]]): Option[scala.List[A]] = List.foldRight(as, Some(Nil), (a, acc) => map2(a, acc)(_ :: _))
+  def sequence[A](as: List[Option[A]]): Option[List[A]] = List.foldRight(as, Some(List.Nil), (a, acc) => map2(a, acc)(Cons(_, _)))
+
+  //Ex:4.5
+  def traverse[A, B](as: List[A])(f: A => Option[B]): Option[List[B]] = List.foldRight(as, Some(List.Nil), (a,acc) => map2(f(a), acc)(Cons(_ ,_)))
 }

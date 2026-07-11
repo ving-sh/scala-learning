@@ -5,6 +5,13 @@ import scala.annotation.tailrec
 enum List[+A] {
   case Nil
   case Cons(head: A, tail: List[A])
+
+  override def toString: String = this match {
+    case Nil => "List()"
+    case Cons(h, t) =>
+      val elements = List.foldLeft(t, h.toString, (acc, a) => s"$acc, $a")
+      s"List($elements)"
+  }
 }
 
 object List {
