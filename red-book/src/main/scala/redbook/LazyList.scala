@@ -72,4 +72,33 @@ object LazyList {
     else cons(as.head, apply(as.tail *))
   }
 
+  //Ex:5.8
+  def continually[A](a: A): LazyList[A] = {
+    lazy val single: LazyList[A] = cons(a, single)
+    single
+  }
+
+  //Ex:5.9
+  def from(n: Int): LazyList[Int] = {
+    lazy val element: LazyList[Int] = cons(n, element.map(_+1))
+    element
+  }
+
+  //Ex:5.10
+  def fibs: LazyList[Int] = {
+    def go(current: Int, next: Int): LazyList[Int] = cons(current, go(next, current + next))
+    go(0,1)
+  }
+
+  //Ex:5.11
+  def unfold[A, S](state: S)(f: S => Option[(A, S)]): LazyList[A] = {
+    import redbook.Option._
+    f(state) match {
+      case Some((a, s)) => cons(a, unfold(s)(f))
+      case None => Empty
+    }
+  }
+
+
+
 }
