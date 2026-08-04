@@ -46,3 +46,13 @@ val continuallyU = (n: Int) =>
   unfold(())(_ => Some((n,())))
 
 continuallyU(2).take(10).toList
+
+//Ex:5.13
+from(1).takeViaUnfold(10).toList
+
+ones.mapViaUnfold(_*3).take(5).toList
+
+from(1).zipWithN("hi").takeViaUnfold(10).toList
+
+from(1).takeViaUnfold(5).zipAll(from(1).takeViaUnfold(10)).toList
+from(1).takeViaUnfold(10).zipAll(from(1).takeViaUnfold(5)).toList
