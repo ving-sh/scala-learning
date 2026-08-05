@@ -56,3 +56,8 @@ from(1).zipWithN("hi").takeViaUnfold(10).toList
 
 from(1).takeViaUnfold(5).zipAll(from(1).takeViaUnfold(10)).toList
 from(1).takeViaUnfold(10).zipAll(from(1).takeViaUnfold(5)).toList
+
+LazyList(1,2,3).startsWith(LazyList (1,3))
+
+LazyList(1,2,3).tails.toList.map(_.toList)
+

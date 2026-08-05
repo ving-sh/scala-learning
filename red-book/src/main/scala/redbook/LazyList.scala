@@ -4,6 +4,9 @@ import redbook.LazyList.{cons, empty, unfold}
 import redbook.Option
 import redbook.Option.*
 
+import scala.List
+import scala.annotation.tailrec
+
 enum LazyList[+A] {
   case Empty
   case Con(h: () => A, t: () => LazyList[A])
@@ -14,8 +17,8 @@ enum LazyList[+A] {
   }
 
   def toList: List[A] = this match {
-    case Empty => List.Nil
-    case Con(h, t) => List.Cons(h(), t().toList)
+    case Empty => Nil
+    case Con(h, t) => h() :: t().toList
   }
 
   def take(n: Int): LazyList[A] = this match {
@@ -51,43 +54,58 @@ enum LazyList[+A] {
   def headOption: Option[A] = foldRight(Option.None)((a, _) => Option.Some(a)) //`Option.` is to use redbook.Option
 
   //Ex:5.7
-  def map[B](f: A => B): LazyList[B] = foldRight(empty[B])((a,acc)=> cons(f(a), acc))
+  def map[B](f: A => B): LazyList[B] = foldRight(empty[B])((a, acc) => cons(f(a), acc))
 
-  def filter(p: A=> Boolean): LazyList[A] = foldRight(empty[A])((a,acc)=> if p(a) then cons(a, acc) else acc)
+  def filter(p: A => Boolean): LazyList[A] = foldRight(empty[A])((a, acc) => if p(a) then cons(a, acc) else acc)
 
-  def append[A2 >: A](that: => LazyList[A2]): LazyList[A2] = foldRight(that)((a,acc)=> cons(a,acc))
+  def append[A2 >: A](that: => LazyList[A2]): LazyList[A2] = foldRight(that)((a, acc) => cons(a, acc))
 
   //Ex:5.13
-  def mapViaUnfold[B](f: A=> B): LazyList[B] = unfold(this){
-    case Con(h,t) => Some(f(h()), t())
+  def mapViaUnfold[B](f: A => B): LazyList[B] = unfold(this) {
+    case Con(h, t) => Some(f(h()), t())
     case _ => None
   }
 
-  def takeViaUnfold(n: Int): LazyList[A] = unfold((n, this)){case (i, Con(h, t)) =>
-    if i > 0 then Some((h(), (i-1, t())))
-    else None
+  def takeViaUnfold(n: Int): LazyList[A] = unfold((n, this)) {
+    case (i, Con(h, t)) if i > 0 => Some((h(), (i - 1, t())))
+    case _ =>  None
   }
 
-  def takeWhileViaUnfold(p: A => Boolean): LazyList[A] = unfold(this){
+  def takeWhileViaUnfold(p: A => Boolean): LazyList[A] = unfold(this) {
     case Con(h, t) if p(h()) => Some(h(), t())
     case _ => None
   }
 
-  def zipWithN[B](n: B): LazyList[(A,B)] = unfold(this){
-    case Con(h,t) => Some((h(), n), t())
+  def zipWithN[B](n: B): LazyList[(A, B)] = unfold(this) {
+    case Con(h, t) => Some((h(), n), t())
     case _ => None
   }
 
-  def zipWith[B](that: LazyList[B]): LazyList[(A,B)] = unfold((this, that)){
-    case (Con(h1, t1), Con(h2, t2)) => Some((h1() -> h2(),t1() -> t2()))
+  def zipWith[B](that: LazyList[B]): LazyList[(A, B)] = unfold((this, that)) {
+    case (Con(h1, t1), Con(h2, t2)) => Some((h1() -> h2(), t1() -> t2()))
     case _ => None
   }
 
   def zipAll[B](that: LazyList[B]): LazyList[(Option[A], Option[B])] = unfold((this, that)) {
     case (Empty, Empty) => None
-    case (Con(h1, t1), Con(h2, t2)) => Some(Some(h1()) -> Some(h2()),t1() -> t2())
+    case (Con(h1, t1), Con(h2, t2)) => Some(Some(h1()) -> Some(h2()), t1() -> t2())
     case (Con(h, t), Empty) => Some((Some(h()) -> None, t() -> Empty))
     case (Empty, Con(h, t)) => Some((None -> Some(h()), Empty -> t()))
+  }
+
+  def startsWith[B >: A](prefix: LazyList[B]): Boolean = {
+    @tailrec
+    def go(one: LazyList[A], two: LazyList[B]): Boolean = (one, two) match {
+      case (Con(_, _), Empty) => true
+      case (Con(h1, t1), Con(h2, t2)) if h1() == h2() => go(t1(), t2())
+      case _ => false
+    }
+    go(this, prefix)
+  }
+
+  def tails: LazyList[LazyList[A]] = unfold(this){
+    case Con(h, t) => Some(cons(h(), t()), t())
+    case _ => None  
   }
 }
 
