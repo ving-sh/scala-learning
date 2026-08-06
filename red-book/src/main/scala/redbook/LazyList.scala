@@ -106,7 +106,12 @@ enum LazyList[+A] {
   def tails: LazyList[LazyList[A]] = unfold(this){
     case Con(h, t) => Some(cons(h(), t()), t())
     case _ => None  
-  }
+  }.append(LazyList(empty))
+
+  def scanRight[B](init: =>B)(f: (A, B) => B): LazyList[B] = foldRight(init->LazyList(init)){(a, acc) =>
+    lazy val b = f(a,acc(0))
+    b -> cons(b, acc(1))
+  }.apply(1)
 }
 
 object LazyList {

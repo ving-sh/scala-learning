@@ -61,3 +61,8 @@ LazyList(1,2,3).startsWith(LazyList (1,3))
 
 LazyList(1,2,3).tails.toList.map(_.toList)
 
+//Ex:5.16
+LazyList(1, 2, 3).scanRight(0)(_ + _).toList
+
+LazyList(1,2,3).scanRight(Empty)((i, acc) => cons(i, acc)).map(_.toList).toList
+
